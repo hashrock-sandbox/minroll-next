@@ -1,6 +1,6 @@
 <template>
   <div>
-    <svg width="600" height="600" viewBox="0 0 600 600">
+    <svg width="600" height="600" viewBox="0 0 600 600" @mousemove="onMouseMove">
       <rect
         v-for="(note, index) in dispNotes"
         :key="index"
@@ -8,6 +8,14 @@
         :y="note.y"
         :width="note.width"
         :height="note.height"
+      ></rect>
+      <rect
+        fill="rgba(0, 0, 0, 0.3)"
+        :x="dispPreview.x"
+        :y="dispPreview.y"
+        :width="dispPreview.width"
+        :height="dispPreview.height"
+        @click="addNote"
       ></rect>
     </svg>
     <div style="background: #DDD;">
@@ -47,9 +55,35 @@ interface NoteRect {
   width: number;
 }
 const TIMEBASE = 480;
+
+function toNoteRect(viewportTransform: Transform) {
+  return function(i: Note): NoteRect {
+    let rect = Rect.fromWidthHeight(i.position, i.noteNo, i.length, 1);
+    let transformed = rect.transform(viewportTransform);
+    return {
+      x: transformed.left,
+      y: transformed.top,
+      width: transformed.width,
+      height: transformed.height
+    };
+  };
+}
+
+function grid(size: number) {
+  return function(x: number) {
+    return Math.floor(x / size) * size;
+  };
+}
+
 export default Vue.extend({
   data() {
     return {
+      preview: {
+        noteNo: 0,
+        velocity: 100,
+        length: 0,
+        position: 0
+      } as Note,
       viewport: {
         note: {
           start: 12 * 2,
@@ -82,6 +116,22 @@ export default Vue.extend({
       ] as Note[]
     };
   },
+  methods: {
+    onMouseMove(ev: MouseEvent) {
+      let vec = new Vec2(ev.offsetX, ev.offsetY).transform(
+        this.viewportTransform.invert()
+      );
+      this.preview = {
+        position: grid(TIMEBASE / 4)(Math.floor(vec.x)),
+        noteNo: Math.floor(vec.y),
+        length: TIMEBASE / 4,
+        velocity: 100
+      };
+    },
+    addNote() {
+      this.notes.push(this.preview);
+    }
+  },
   computed: {
     viewportTransform(): Transform {
       const noteRange = this.viewport.note.end - this.viewport.note.start;
@@ -96,20 +146,10 @@ export default Vue.extend({
       return Transform.rectToRect(from, to);
     },
     dispNotes(): NoteRect[] {
-      return this.notes.map(
-        (i: Note): NoteRect => {
-          let rect = Rect.fromWidthHeight(i.position, i.noteNo, i.length, 1);
-
-          let t = rect.transform(this.viewportTransform);
-          console.log(t);
-          return {
-            x: t.left,
-            y: t.top,
-            width: t.width,
-            height: t.height
-          };
-        }
-      );
+      return this.notes.map(toNoteRect(this.viewportTransform));
+    },
+    dispPreview(): NoteRect {
+      return toNoteRect(this.viewportTransform)(this.preview);
     }
   }
 });
