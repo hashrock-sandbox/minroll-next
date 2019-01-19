@@ -83,11 +83,6 @@ export default Vue.extend({
           let rect = Rect.fromWidthHeight(i.position, i.noteNo, i.length, 1);
           const noteRange = this.viewport.note.end - this.viewport.note.start;
           const timeRange = this.viewport.time.end - this.viewport.time.start;
-
-          // let from = Rect.fromTwoPoints(
-          //   new Vec2(this.viewport.time.start, this.viewport.note.end),
-          //   new Vec2(this.viewport.time.end, this.viewport.note.start)
-          // );
           let from = Rect.fromWidthHeight(
             this.viewport.time.start,
             this.viewport.note.end,
