@@ -1,0 +1,16 @@
+{
+  "name": "minroll2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@vue/component-compiler-utils": "^2.5.0",
+    "parcel": "^1.11.0",
+    "vue-template-compiler": "^2.5.22"
+  },
+  "dependencies": {
+    "paintvec": "^0.1.1",
+    "vue": "^2.5.22",
+    "vue-hot-reload-api": "^2.3.1"
+  }
+}
