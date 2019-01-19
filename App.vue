@@ -58,8 +58,8 @@ const TIMEBASE = 480;
 
 function toNoteRect(viewportTransform: Transform) {
   return function(i: Note): NoteRect {
-    let rect = Rect.fromWidthHeight(i.position, i.noteNo, i.length, 1);
-    let transformed = rect.transform(viewportTransform);
+    const rect = Rect.fromWidthHeight(i.position, i.noteNo, i.length, 1);
+    const transformed = rect.transform(viewportTransform);
     return {
       x: transformed.left,
       y: transformed.top,
@@ -118,7 +118,7 @@ export default Vue.extend({
   },
   methods: {
     onMouseMove(ev: MouseEvent) {
-      let vec = new Vec2(ev.offsetX, ev.offsetY).transform(
+      const vec = new Vec2(ev.offsetX, ev.offsetY).transform(
         this.viewportTransform.invert()
       );
       this.preview = {
@@ -136,13 +136,13 @@ export default Vue.extend({
     viewportTransform(): Transform {
       const noteRange = this.viewport.note.end - this.viewport.note.start;
       const timeRange = this.viewport.time.end - this.viewport.time.start;
-      let from = Rect.fromWidthHeight(
+      const from = Rect.fromWidthHeight(
         this.viewport.time.start,
         this.viewport.note.end,
         timeRange,
         -noteRange
       );
-      let to = Rect.fromWidthHeight(0, 0, 600, 600);
+      const to = Rect.fromWidthHeight(0, 0, 600, 600);
       return Transform.rectToRect(from, to);
     },
     dispNotes(): NoteRect[] {
