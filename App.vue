@@ -68,6 +68,12 @@ export default Vue.extend({
           position: 0
         },
         {
+          noteNo: 12 * 4 + 1,
+          velocity: 100,
+          length: (TIMEBASE / 4) * 2,
+          position: (TIMEBASE / 4) * 3
+        },
+        {
           noteNo: 12 * 4,
           velocity: 100,
           length: (TIMEBASE / 4) * 2,
@@ -77,21 +83,24 @@ export default Vue.extend({
     };
   },
   computed: {
+    viewportTransform(): Transform {
+      const noteRange = this.viewport.note.end - this.viewport.note.start;
+      const timeRange = this.viewport.time.end - this.viewport.time.start;
+      let from = Rect.fromWidthHeight(
+        this.viewport.time.start,
+        this.viewport.note.end,
+        timeRange,
+        -noteRange
+      );
+      let to = Rect.fromWidthHeight(0, 0, 600, 600);
+      return Transform.rectToRect(from, to);
+    },
     dispNotes(): NoteRect[] {
       return this.notes.map(
         (i: Note): NoteRect => {
           let rect = Rect.fromWidthHeight(i.position, i.noteNo, i.length, 1);
-          const noteRange = this.viewport.note.end - this.viewport.note.start;
-          const timeRange = this.viewport.time.end - this.viewport.time.start;
-          let from = Rect.fromWidthHeight(
-            this.viewport.time.start,
-            this.viewport.note.end,
-            timeRange,
-            -noteRange
-          );
-          let to = Rect.fromWidthHeight(0, 0, 600, 600);
 
-          let t = rect.transform(Transform.rectToRect(from, to));
+          let t = rect.transform(this.viewportTransform);
           console.log(t);
           return {
             x: t.left,
