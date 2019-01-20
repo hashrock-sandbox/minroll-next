@@ -17,6 +17,17 @@
         :height="dispPreview.height"
         @click="addNote"
       ></rect>
+
+      <rect :x="600 - 10" :y="dispViewport.y" :width="10" :height="dispViewport.height"></rect>
+      <rect
+        :x="dispViewport.x"
+        :y="0"
+        :width="dispViewport.width"
+        :height="10"
+        @pointerdown="vScrollDown"
+        @pointerup="vScroll = false"
+        @pointermove="vScrollMove"
+      ></rect>
     </svg>
     <div style="background: #DDD;">
       <div>
@@ -78,6 +89,9 @@ function grid(size: number) {
 export default Vue.extend({
   data() {
     return {
+      track: {
+        length: TIMEBASE * 4 * 4
+      },
       preview: {
         noteNo: 0,
         velocity: 100,
@@ -91,7 +105,7 @@ export default Vue.extend({
         },
         time: {
           start: 0,
-          end: (TIMEBASE / 4) * 16 * 4
+          end: (TIMEBASE / 4) * 16 * 2
         }
       },
       notes: [
@@ -113,10 +127,24 @@ export default Vue.extend({
           length: (TIMEBASE / 4) * 2,
           position: (TIMEBASE / 4) * 1
         }
-      ] as Note[]
+      ] as Note[],
+      vScroll: false,
+      vScrollOffset: 0
     };
   },
   methods: {
+    vScrollDown(e: PointerEvent) {
+      const rect: any = e.target;
+      rect.setPointerCapture(e.pointerId);
+      const bbox = rect.getBoundingClientRect();
+      this.vScrollOffset = e.clientX - bbox.left;
+    },
+    vScrollMove(e: PointerEvent) {
+      // if (this.vScroll) {
+      //   this.viewport.time.start =
+      // }
+    },
+
     onMouseMove(ev: MouseEvent) {
       const vec = new Vec2(ev.offsetX, ev.offsetY).transform(
         this.viewportTransform.invert()
@@ -150,7 +178,40 @@ export default Vue.extend({
     },
     dispPreview(): NoteRect {
       return toNoteRect(this.viewportTransform)(this.preview);
+    },
+    dispViewport() {
+      const height = (this.viewport.note.end - this.viewport.note.start) / 128;
+
+      return {
+        x: (this.viewport.time.start / this.track.length) * 600,
+        y: ((128 - this.viewport.note.start) / 128 - height) * 600,
+        width:
+          ((this.viewport.time.end - this.viewport.time.start) /
+            this.track.length) *
+          600,
+        height: height * 600
+      };
     }
+  },
+  mounted() {
+    document.body.addEventListener("keydown", (ev: KeyboardEvent) => {
+      if (ev.key === "ArrowLeft") {
+        this.viewport.time.start -= TIMEBASE * 4;
+        this.viewport.time.end -= TIMEBASE * 4;
+      }
+      if (ev.key === "ArrowRight") {
+        this.viewport.time.start += TIMEBASE * 4;
+        this.viewport.time.end += TIMEBASE * 4;
+      }
+      if (ev.key === "ArrowUp") {
+        this.viewport.note.start += 4;
+        this.viewport.note.end += 4;
+      }
+      if (ev.key === "ArrowDown") {
+        this.viewport.note.start -= 4;
+        this.viewport.note.end -= 4;
+      }
+    });
   }
 });
 </script>
