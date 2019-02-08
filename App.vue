@@ -18,7 +18,15 @@
         @click="addNote"
       ></rect>
 
-      <rect :x="600 - 10" :y="dispViewport.y" :width="10" :height="dispViewport.height"></rect>
+      <rect
+        :x="600 - 10"
+        :y="dispViewport.y"
+        :width="10"
+        :height="dispViewport.height"
+        @pointerdown="vScrollDown"
+        @pointerup="vScroll = false"
+        @pointermove="vScrollMove"
+      ></rect>
       <rect
         :x="dispViewport.x"
         :y="0"
@@ -129,7 +137,9 @@ export default Vue.extend({
         }
       ] as Note[],
       hScroll: false,
-      hScrollOffset: 0
+      hScrollOffset: 0,
+      vScroll: false,
+      vScrollOffset: 0
     };
   },
   methods: {
@@ -151,6 +161,27 @@ export default Vue.extend({
         let range = this.viewport.time.end - this.viewport.time.start;
         this.viewport.time.start = start;
         this.viewport.time.end = start + range;
+      }
+    },
+    vScrollDown(e: PointerEvent) {
+      const rect: any = e.target;
+      rect.setPointerCapture(e.pointerId);
+      const bbox = rect.getBoundingClientRect();
+      this.vScrollOffset = e.clientY - bbox.top;
+      this.vScroll = true;
+    },
+    vScrollMove(e: PointerEvent) {
+      const rect: any = e.target;
+      const bbox = rect.getBoundingClientRect();
+      const y = e.clientY - bbox.top;
+      if (this.vScroll) {
+        let ypos = y - this.vScrollOffset;
+        console.log(ypos);
+        // let start = new Vec2(xpos, 0).transform(this.viewportTransform.invert())
+        //   .x;
+        // let range = this.viewport.time.end - this.viewport.time.start;
+        // this.viewport.time.start = start;
+        // this.viewport.time.end = start + range;
       }
     },
 
