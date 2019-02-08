@@ -24,9 +24,9 @@
         :y="0"
         :width="dispViewport.width"
         :height="10"
-        @pointerdown="vScrollDown"
-        @pointerup="vScroll = false"
-        @pointermove="vScrollMove"
+        @pointerdown="hScrollDown"
+        @pointerup="hScroll = false"
+        @pointermove="hScrollMove"
       ></rect>
     </svg>
     <div style="background: #DDD;">
@@ -128,21 +128,30 @@ export default Vue.extend({
           position: (TIMEBASE / 4) * 1
         }
       ] as Note[],
-      vScroll: false,
-      vScrollOffset: 0
+      hScroll: false,
+      hScrollOffset: 0
     };
   },
   methods: {
-    vScrollDown(e: PointerEvent) {
+    hScrollDown(e: PointerEvent) {
       const rect: any = e.target;
       rect.setPointerCapture(e.pointerId);
       const bbox = rect.getBoundingClientRect();
-      this.vScrollOffset = e.clientX - bbox.left;
+      this.hScrollOffset = e.clientX - bbox.left;
+      this.hScroll = true;
     },
-    vScrollMove(e: PointerEvent) {
-      // if (this.vScroll) {
-      //   this.viewport.time.start =
-      // }
+    hScrollMove(e: PointerEvent) {
+      const rect: any = e.target;
+      const bbox = rect.getBoundingClientRect();
+      const x = e.clientX - bbox.left;
+      if (this.hScroll) {
+        let xpos = x - this.hScrollOffset;
+        let start = new Vec2(xpos, 0).transform(this.viewportTransform.invert())
+          .x;
+        let range = this.viewport.time.end - this.viewport.time.start;
+        this.viewport.time.start = start;
+        this.viewport.time.end = start + range;
+      }
     },
 
     onMouseMove(ev: MouseEvent) {
