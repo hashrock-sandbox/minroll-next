@@ -167,21 +167,17 @@ export default Vue.extend({
       const rect: any = e.target;
       rect.setPointerCapture(e.pointerId);
       const bbox = rect.getBoundingClientRect();
-      this.vScrollOffset = e.clientY - bbox.top;
+      this.vScrollOffset = bbox.bottom - e.clientY;
       this.vScroll = true;
     },
     vScrollMove(e: PointerEvent) {
       const rect: any = e.target;
       const bbox = rect.getBoundingClientRect();
-      const y = e.clientY - bbox.top;
+      const y = e.clientY + this.vScrollOffset;
       if (this.vScroll) {
-        let ypos = y - this.vScrollOffset;
-        console.log(ypos);
-        // let start = new Vec2(xpos, 0).transform(this.viewportTransform.invert())
-        //   .x;
-        // let range = this.viewport.time.end - this.viewport.time.start;
-        // this.viewport.time.start = start;
-        // this.viewport.time.end = start + range;
+        let range = this.viewport.note.end - this.viewport.note.start;
+        this.viewport.note.start = ((600 - y) / 600) * 128;
+        this.viewport.note.end = this.viewport.note.start + range;
       }
     },
 
