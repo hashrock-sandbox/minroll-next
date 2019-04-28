@@ -160,7 +160,15 @@ export default Vue.extend({
           .x;
         let range = this.viewport.time.end - this.viewport.time.start;
         this.viewport.time.start = start;
-        this.viewport.time.end = start + range;
+
+        //範囲制限
+        if (this.viewport.time.start < 0) {
+          this.viewport.time.start = 0;
+        }
+        if (this.viewport.time.start + range > this.track.length) {
+          this.viewport.time.start = this.track.length - range;
+        }
+        this.viewport.time.end = this.viewport.time.start + range;
       }
     },
     vScrollDown(e: PointerEvent) {
@@ -177,6 +185,14 @@ export default Vue.extend({
       if (this.vScroll) {
         let range = this.viewport.note.end - this.viewport.note.start;
         this.viewport.note.start = ((600 - y) / 600) * 128;
+
+        //範囲制限
+        if (this.viewport.note.start < 0) {
+          this.viewport.note.start = 0;
+        }
+        if (this.viewport.note.start + range > 128) {
+          this.viewport.note.start = 128 - range;
+        }
         this.viewport.note.end = this.viewport.note.start + range;
       }
     },
