@@ -1,20 +1,16 @@
 {
-  "name": "minroll2",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "devDependencies": {
-    "@vue/component-compiler-utils": "^2.5.0",
-    "parcel": "^1.11.0",
-    "typescript": "^3.2.4",
-    "vue-template-compiler": "^2.5.22"
-  },
-  "dependencies": {
-    "paintvec": "^0.1.1",
-    "vue": "^2.5.22",
-    "vue-hot-reload-api": "^2.3.1"
-  },
+  "name": "minroll-next",
+  "version": "0.0.0",
   "scripts": {
-    "dev": "parcel index.html"
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.2.1",
+    "@vue/compiler-sfc": "^3.0.5",
+    "vite": "^2.1.5",
+    "paintvec": "^0.3.1",
+    "vue": "^3.0.5"
   }
 }

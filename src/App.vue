@@ -59,7 +59,6 @@
 </template>
 <script lang="ts">
 import { Transform, Rect, Vec2 } from "paintvec";
-import Vue from "vue";
 
 interface Note {
   noteNo: number;
@@ -77,7 +76,7 @@ const TIMEBASE = 480;
 
 function toNoteRect(viewportTransform: Transform) {
   return function(i: Note): NoteRect {
-    const rect = Rect.fromWidthHeight(i.position, i.noteNo, i.length, 1);
+    const rect = Rect.from({x: i.position, y: i.noteNo, width: i.length, height: 1});
     const transformed = rect.transform(viewportTransform);
     return {
       x: transformed.left,
@@ -94,7 +93,7 @@ function grid(size: number) {
   };
 }
 
-export default Vue.extend({
+export default {
   data() {
     return {
       track: {
@@ -216,13 +215,14 @@ export default Vue.extend({
     viewportTransform(): Transform {
       const noteRange = this.viewport.note.end - this.viewport.note.start;
       const timeRange = this.viewport.time.end - this.viewport.time.start;
-      const from = Rect.fromWidthHeight(
-        this.viewport.time.start,
-        this.viewport.note.end,
-        timeRange,
-        -noteRange
+      const from = Rect.from({
+        x: this.viewport.time.start,
+        y: this.viewport.note.end,
+        width: timeRange,
+        height: -noteRange
+      }
       );
-      const to = Rect.fromWidthHeight(0, 0, 600, 600);
+      const to = Rect.from({x:0, y: 0, width: 600, height: 600});
       return Transform.rectToRect(from, to);
     },
     dispNotes(): NoteRect[] {
@@ -265,7 +265,7 @@ export default Vue.extend({
       }
     });
   }
-});
+};
 </script>
 
 <style>
